@@ -24,10 +24,20 @@
 // Ejecutar:  ./bin/ejercicio3
 
 #include <iostream>
-
 // Funciones sueltas
-double area(double base, double altura) { return base * altura; }
-double perimetro(double base, double altura) { return 2 * (base + altura); }
+double area(double base, double altura) {
+    return base * altura;
+}
+
+double perimetro(double base, double altura) {
+    return 2 * (base + altura);
+}
+
+// TODO (prediccion):
+// El bug esta al imprimir el Rectangulo 2.
+// Se usa altura1 junto con base2:
+// area(base2, altura1) y perimetro(base2, altura1).
+// Deberia usarse altura2 en ambos casos.
 
 void imprimirConFuncionesSueltas() {
     double base1 = 10.0, altura1 = 5.0;
@@ -36,6 +46,7 @@ void imprimirConFuncionesSueltas() {
     std::cout << "Rectangulo 1, Area: " << area(base1, altura1)
               << ", Perimetro: " << perimetro(base1, altura1) << std::endl;
 
+    // Dejamos el bug porque el ejercicio pide mostrarlo
     std::cout << "Rectangulo 2, Area: " << area(base2, altura1)
               << ", Perimetro: " << perimetro(base2, altura1) << std::endl;
 }
@@ -44,16 +55,30 @@ void imprimirConFuncionesSueltas() {
 struct Rectangulo {
     double base;
     double altura;
-    double area() { return base * altura; }
-    double perimetro() { return 2 * (base + altura); }
+
+    double area() {
+        return base * altura;
+    }
+
+    double perimetro() {
+        return 2 * (base + altura);
+    }
 };
 
 void imprimirConObjetos() {
-    // TODO: declara rect1 (base 10, altura 5) y rect2 (base 6, altura 4),
-    // igual que declaraste 'r' en el ejercicio 2.
+    Rectangulo rect1;
+    rect1.base = 10.0;
+    rect1.altura = 5.0;
 
-    // TODO: imprime el resumen de cada uno, en el mismo formato de arriba,
-    // usando rect1.area(), rect1.perimetro(), rect2.area(), rect2.perimetro()
+    Rectangulo rect2;
+    rect2.base = 6.0;
+    rect2.altura = 4.0;
+
+    std::cout << "Rectangulo 1, Area: " << rect1.area()
+              << ", Perimetro: " << rect1.perimetro() << std::endl;
+
+    std::cout << "Rectangulo 2, Area: " << rect2.area()
+              << ", Perimetro: " << rect2.perimetro() << std::endl;
 }
 
 int main() {
