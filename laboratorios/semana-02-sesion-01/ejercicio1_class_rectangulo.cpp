@@ -29,9 +29,9 @@ public:
     double getAltura() { return altura; }
 
     bool setBase(double nuevaBase) {
-        // TODO: si nuevaBase no es positiva, devuelve false sin modificar base.
-        // Si es positiva, asigna base = nuevaBase y devuelve true.
-        return false;
+        if(nuevaBase <= 0 ) {return false;}
+        base = nuevaBase;
+        return true;
     }
 
     bool setAltura(double nuevaAltura) {
