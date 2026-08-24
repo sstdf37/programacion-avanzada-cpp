@@ -29,24 +29,27 @@ public:
     double getAltura() { return altura; }
 
     bool setBase(double nuevaBase) {
-        if(nuevaBase <= 0 ) {return false;}
+        if (nuevaBase <= 0) {
+            return false;
+        }
         base = nuevaBase;
         return true;
     }
 
     bool setAltura(double nuevaAltura) {
-        // TODO: mismo patron que setBase(), pero para altura.
-        return false;
+        if (nuevaAltura <= 0) {
+            return false;
+        }
+        altura = nuevaAltura;
+        return true;
     }
 
     double area() {
-        // TODO: retorna base * altura
-        return 0.0;
+        return base * altura;
     }
 
     double perimetro() {
-        // TODO: retorna 2 * (base + altura)
-        return 0.0;
+        return 2 * (base + altura);
     }
 };
 
@@ -55,15 +58,19 @@ int main() {
     r.setBase(10.0);
     r.setAltura(5.0);
 
-    std::cout << "Area: " << r.area() << ", Perimetro: " << r.perimetro() << std::endl;
+    std::cout << "Area: " << r.area()
+              << ", Perimetro: " << r.perimetro() << std::endl;
 
     bool aceptado = r.setBase(-3.0);
-    std::cout << "setBase(-3) rechazado: " << (!aceptado ? "true" : "false")
+    std::cout << "setBase(-3) rechazado: "
+              << (!aceptado ? "true" : "false")
               << ", base sigue en: " << r.getBase() << std::endl;
 
     r.setBase(20.0);
     r.setAltura(10.0);
-    std::cout << "Area: " << r.area() << ", Perimetro: " << r.perimetro() << std::endl;
+
+    std::cout << "Area: " << r.area()
+              << ", Perimetro: " << r.perimetro() << std::endl;
 
     return 0;
 }
