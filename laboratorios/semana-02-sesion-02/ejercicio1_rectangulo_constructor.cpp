@@ -33,16 +33,31 @@ private:
 
 public:
     Rectangulo(double baseInicial, double alturaInicial) {
-        // TODO: llama setBase(baseInicial). Si devuelve false, asigna
-        // base = 1.0 y avisa por consola:
-        // "Aviso: base invalida, se uso 1.0 por defecto"
-
-        // TODO: haz lo mismo con setAltura(alturaInicial) y altura.
+        if (!setBase(baseInicial)) {
+            base = 1.0;
+            std::cout << "Aviso: base invalida, se uso 1.0 por defecto" << std::endl;
+        }
+        if (!setAltura(alturaInicial)) {
+            altura = 1.0;
+            std::cout << "Aviso: altura invalida, se uso 1.0 por defecto" << std::endl;
+        }
     }
-
+bool setBase(double nuevaBase) {
+        if (nuevaBase <= 0.0) {
+            return false;
+        }
+        base = nuevaBase;
+        return true;
+    }
+    bool setAltura(double nuevaAltura) {
+        if (nuevaAltura <= 0.0) {
+            return false;
+        }
+        altura = nuevaAltura;
+        return true;
+    }
     ~Rectangulo() {
-        // TODO: imprime "Rectangulo destruido: base=" seguido de base,
-        // ", altura=" y altura.
+        std::cout << "Rectangulo destruido: base=" << base << ", altura=" << altura << std::endl;
     }
 
     double getBase() { return base; }
