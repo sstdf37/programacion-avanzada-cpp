@@ -32,6 +32,11 @@ public:
     }
 
     bool setSalarioBase(double nuevoSalario) {
+        if (nuevoSalario <= 0) {
+            return false;
+        }
+        salarioBase = nuevoSalario;
+        return true;
         // TODO: si nuevoSalario no es positivo, devuelve false sin
         // modificar salarioBase. Si no, asigna salarioBase = nuevoSalario
         // y devuelve true.
@@ -39,6 +44,11 @@ public:
     }
 
     bool setAniosServicio(double nuevosAnios) {
+        if (nuevosAnios < 0) {
+            return false;
+        }
+        aniosServicio = nuevosAnios;
+        return true;
         // TODO: mismo patron que setSalarioBase(), pero para
         // aniosServicio (no puede ser negativo).
         return false;
@@ -48,11 +58,13 @@ public:
     double getAniosServicio() { return aniosServicio; }
 
     void describir() {
+        std::cout << "Empleado con salario base " << salarioBase << ", " << aniosServicio << " anios de servicio" << std::endl;
         // TODO: imprime "Empleado con salario base " + salarioBase +
         // ", " + aniosServicio + " anios de servicio"
     }
 
     double calcularBonoAntiguedad() {
+        return aniosServicio * 100.0;
         // TODO: retorna aniosServicio * 100.0
         return 0.0;
     }
