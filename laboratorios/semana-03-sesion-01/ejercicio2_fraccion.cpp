@@ -17,7 +17,6 @@
 // Ejecutar:  ./bin/ejercicio2
 
 #include <iostream>
-
 class Fraccion {
 private:
     int numerador;
@@ -28,38 +27,53 @@ public:
         if (denominadorInicial == 0) {
             numerador = 0;
             denominador = 1;
-            std::cout << "Aviso: denominador invalido, se uso 0/1 por defecto" << std::endl;
+            std::cout << "Aviso: denominador invalido, se uso 0/1 por defecto"
+                      << std::endl;
         } else {
             numerador = numeradorInicial;
             denominador = denominadorInicial;
         }
     }
 
-    int getNumerador() { return numerador; }
-    int getDenominador() { return denominador; }
+    int getNumerador() { 
+        return numerador; 
+    }
+
+    int getDenominador() { 
+        return denominador; 
+    }
 
     Fraccion operator+(Fraccion otra) {
-        // TODO: calcula nuevoNumerador = numerador * otra.getDenominador()
-        // + otra.getNumerador() * denominador, y nuevoDenominador =
-        // denominador * otra.getDenominador(). Retorna un Fraccion nuevo
-        // con esos dos valores.
-        return Fraccion(0, 1);
+
+        int nuevoNumerador =
+            numerador * otra.getDenominador()
+            + otra.getNumerador() * denominador;
+
+        int nuevoDenominador =
+            denominador * otra.getDenominador();
+
+        return Fraccion(nuevoNumerador, nuevoDenominador);
     }
 };
 
 std::ostream& operator<<(std::ostream& os, Fraccion f) {
-    // TODO: escribe en os algo como "numerador/denominador", usando
-    // f.getNumerador() y f.getDenominador(), y despues retorna os.
+
+    os << f.getNumerador() << "/" << f.getDenominador();
+
     return os;
 }
 
 int main() {
+
     Fraccion f1(1, 2);
     Fraccion f2(1, 3);
+
     Fraccion suma = f1 + f2;
+
     std::cout << f1 << " + " << f2 << " = " << suma << std::endl;
 
     Fraccion f3(1, 0);
+
     std::cout << "f3: " << f3 << std::endl;
 
     return 0;

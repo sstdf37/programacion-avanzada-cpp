@@ -30,31 +30,35 @@ public:
         if (nuevaVelocidad < 0) {
             return false;
         }
+
         velocidadKmh = nuevaVelocidad;
         return true;
-        // TODO: si nuevaVelocidad es negativa, devuelve false sin modificar
-        // velocidadKmh. Si no, asigna velocidadKmh = nuevaVelocidad y
-        // devuelve true.
-        return false;
     }
 
     bool setKilometraje(double nuevoKilometraje) {
         if (nuevoKilometraje < 0) {
             return false;
         }
+
         kilometraje = nuevoKilometraje;
         return true;
-        // TODO: mismo patron que setVelocidadKmh(), pero para kilometraje
-        // (no puede ser negativo).
-        return false;}
+    }
 
-    double getVelocidadKmh() { return velocidadKmh; }
-    double getKilometraje() { return kilometraje; }
+    double getVelocidadKmh() {
+        return velocidadKmh;
+    }
+
+    double getKilometraje() {
+        return kilometraje;
+    }
 
     void describir() {
-        std::cout << "Vehiculo a " << velocidadKmh << " km/h, " << kilometraje << " km recorridos" << std::endl;
-        // TODO: imprime "Vehiculo a " + velocidadKmh + " km/h, " +
-        // kilometraje + " km recorridos"
+        std::cout << "Vehiculo a "
+                  << velocidadKmh
+                  << " km/h, "
+                  << kilometraje
+                  << " km recorridos"
+                  << std::endl;
     }
 };
 
