@@ -17,8 +17,9 @@ struct Circulo {
     double radio;
 
     double area() {
+        return 3.14159265 * radio * radio;
         // TODO: retorna 3.14159265 * radio * radio
-        return 0.0;
+        // Esto ya está hecho arriba, la línea vacía se puede eliminar
     }
 };
 

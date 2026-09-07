@@ -21,11 +21,14 @@ private:
 
 public:
     VelaEncendida(double minutosIniciales) {
+        minutosRestantes = minutosIniciales;
+        std::cout << "Vela encendida con " << minutosRestantes << " minutos" << std::endl;
         // TODO: asigna minutosIniciales a minutosRestantes e imprime
         // "Vela encendida con " + minutosRestantes + " minutos"
     }
 
     ~VelaEncendida() {
+        std::cout<<"La vela se apago"<< std::endl;
         // TODO: imprime "La vela se apago"
     }
 };

@@ -18,11 +18,13 @@ private:
 
 public:
     double getTemperaturaActual() {
+        return temperaturaActual;
         // TODO: retorna temperaturaActual
-        return 0.0;
+
     }
 
     void fijarTemperaturaInicial(double t) {
+        temperaturaActual = t;
         // TODO: asigna t a temperaturaActual
     }
 };

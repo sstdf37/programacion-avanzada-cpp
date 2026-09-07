@@ -19,6 +19,7 @@ private:
 
 public:
     Cronometro(double segundosIniciales) {
+        segundos = segundosIniciales;
         // TODO: asigna segundosIniciales a segundos
     }
 
