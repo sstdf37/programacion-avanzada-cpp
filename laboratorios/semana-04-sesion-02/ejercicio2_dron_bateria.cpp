@@ -30,14 +30,11 @@ class Bateria {
 //   imprime "Dron despegando con <nivel>% de bateria" y devuelve true.
 // void descargar(int porcentaje): reduce el nivel de carga de la bateria
 //   en ese porcentaje.
-class Dron : public Bateria {
+class Dron {
     private:
         Bateria bateria;
     public:
-        Dron() {
-            bateria = Bateria();
-        }
-
+    
         bool despegar() {
             if (!bateria.estaCargada()) {
                 std::cout << "Bateria muy baja, no despega" << std::endl;
