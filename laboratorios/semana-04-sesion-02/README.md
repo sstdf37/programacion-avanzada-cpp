@@ -72,7 +72,7 @@ Tu `Impresora` de la sesión pasada (con herencia virtual de `Dispositivo`, sin 
 
 **Antes de escribir código:** explica por qué ese diseño es forzado, igual que `Carro` heredando de `Motor` en el Ejercicio 1.
 
-_(tu respuesta)_
+_(Es forzado porque Impresora no es un Carutcho, si no que tiene un Cartucho la impresora)_
 
 Diseña en su lugar:
 
