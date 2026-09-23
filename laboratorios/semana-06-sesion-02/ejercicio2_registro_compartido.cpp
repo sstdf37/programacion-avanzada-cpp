@@ -5,14 +5,14 @@
 class RegistroDeVuelo {
     private:
         // TODO: cambia "double* alturas" por std::unique_ptr<double[]>.
-        double* alturas;
+        std::unique_ptr<double[]> alturas;
         int capacidad;
     public:
         RegistroDeVuelo(int nuevaCapacidad) {
             capacidad = nuevaCapacidad;
             // TODO: crea "alturas" con std::make_unique<double[]>(capacidad)
             // en vez de "new double[capacidad]".
-            alturas = new double[capacidad];
+            alturas = std::make_unique<double[]>(capacidad);
             std::cout << "Registro de vuelo creado para " << capacidad << " lecturas" << std::endl;
         }
 
@@ -26,15 +26,13 @@ class RegistroDeVuelo {
 
         // TODO: con unique_ptr como atributo, ya no hace falta nada de
         // esto. Borra el destructor completo (unique_ptr libera solo).
-        ~RegistroDeVuelo() {
-            std::cout << "Destruyendo registro (capacidad " << capacidad << ")" << std::endl;
-            delete[] alturas;
-        }
+
 };
 
 class MonitorDeVuelo {
     private:
         // TODO: declara "registro" como std::shared_ptr<RegistroDeVuelo>.
+        std::shared_ptr<RegistroDeVuelo> registro;
         int idMonitor;
     public:
         // TODO: el constructor recibe std::shared_ptr<RegistroDeVuelo>
@@ -42,9 +40,15 @@ class MonitorDeVuelo {
         // registro = std::move(unRegistro); (mover el shared_ptr local
         // hacia el atributo evita una copia de mas, aunque la clase ya
         // permite copiar shared_ptr sin ningun riesgo).
-        MonitorDeVuelo(int unId) {
+        MonitorDeVuelo(std::shared_ptr<RegistroDeVuelo> nuevoRegistro, int unId) {
             idMonitor = unId;
+            
+            registro = std::move(nuevoRegistro);
+            std:: cout << "Monitor: " << idMonitor << "  conectado. Cuenta: " << registro.use_count()
+             << std::endl;
+        
         }
+
 
         void reportar(int indice) {
             std::cout << "Monitor " << idMonitor << " ve altura " << 0.0 << std::endl;
@@ -62,6 +66,24 @@ int main() {
     std::cout << "registroSolo.getAltura(0) = " << registroSolo.getAltura(0) << std::endl;
 
     std::cout << "---" << std::endl;
+
+    std::shared_ptr<RegistroDeVuelo> registroCcompartido = std::make_shared<RegistroDeVuelo>(5);
+
+    registroCcompartido->guardarAltura(0, 200.0);
+    std::cout << "Cuenta antes de monitorear: " << registroCcompartido.use_count() << std::endl;
+
+    {
+        MonitorDeVuelo torre_quito(registroCcompartido, 1);
+        MonitorDeVuelo torre_ambato(registroCcompartido, 2);
+        MonitorDeVuelo tore_cuenca(registroCcompartido, 3);
+
+        std::cout << "Cuenta despues de monitores: " << registroCcompartido.use_count() << std::endl;
+        torre_quito.reportar(0);
+        torre_ambato.reportar(0);
+        tore_cuenca.reportar(0);
+    }
+
+    std::cout << "Cuenta despues de los monitores: " << registroCcompartido.use_count() << std::endl;
 
     // TODO: crea "compartido" con
     // std::make_shared<RegistroDeVuelo>(5) en vez de un objeto local.
