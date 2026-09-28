@@ -82,6 +82,10 @@ class RegistroVuelo {
             std::cout << "Registro vacio (fue movido)" << std::endl;
             return 0.0;
         }
+        if (indice < 0 || indice >= siguiente) {
+            std::cout << "Indice fuera de rango" << std::endl;
+            return 0.0;
+        }
         return alturas[indice];
     }
     
