@@ -4,6 +4,82 @@
 // Este archivo no tiene codigo de partida. Escribe tu de tu propia clase,
 // tus propios includes y tu propio main().
 //
+#include <iostream>
+class Dispositivo {
+private:
+    double consumoWatts;
+public:
+    bool setConsumoWatts(double c) {
+        if (c > 0 && c <= 100) {
+            consumoWatts = c;
+            return true;
+        }
+        return false;
+    }
+    double getConsumoWatts() {
+        return consumoWatts;
+    }
+};
+
+class DispositivoConectado : public Dispositivo {
+private:
+    int canalRed;
+public:
+    bool setCanalRed(int c) {
+        if (c >= 1 && c <= 11) {
+            canalRed = c;
+            return true;
+        }
+        return false;
+    }
+    int getCanalRed() {
+        return canalRed;
+    }
+};
+
+class SensorTemperatura : public DispositivoConectado {
+private:
+    double lecturaActual;
+public:
+    bool setLecturaActual(double l) {
+        if (l >= -40 && l <= 125) {
+            lecturaActual = l;
+            return true;
+        }
+        return false;
+    }
+    double getLecturaActual() {
+        return lecturaActual;
+    }
+    bool alertaCritica() {
+        return lecturaActual > 100;
+    }
+};
+
+int main() {
+    SensorTemperatura s;
+
+    s.setConsumoWatts(5.5);
+    s.setCanalRed(6);
+    s.setLecturaActual(45.0);
+
+    std::cout << std::boolalpha;
+
+    std::cout << "Alerta con 45.0: "
+              << s.alertaCritica() << std::endl;
+
+    s.setLecturaActual(110.0);
+
+    std::cout << "Alerta con 110.0: "
+              << s.alertaCritica() << std::endl;
+
+    std::cout << "Consumo: "
+              << s.getConsumoWatts() << std::endl;
+
+    std::cout << "Canal: "
+              << s.getCanalRed() << std::endl;
+
+}
 // Disena tres clases en cadena:
 //
 // Dispositivo: atributo privado consumoWatts (double). Setter bool

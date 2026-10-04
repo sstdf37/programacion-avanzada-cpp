@@ -4,6 +4,71 @@
 // Este archivo no tiene codigo de partida. Escribe tu de tu propia clase,
 // tus propios includes y tu propio main().
 //
+#include <iostream>
+class Componente {
+private:
+    int codigoSerie;
+public:
+    bool setCodigoSerie(int c) {
+        if (c >= 1000 && c <= 9999) {
+            codigoSerie = c;
+            return true;
+        }
+        return false;
+    }
+    int getCodigoSerie() const { return codigoSerie; }
+};
+
+class ComponenteMecanico : virtual public Componente {
+private:
+    double pesoKg;
+public:
+    bool setPesoKg(double p) {
+        if (p > 0 && p <= 50) {
+            pesoKg = p;
+            return true;
+        }
+        return false;
+    }
+    double getPesoKg() const { return pesoKg; }
+};
+
+class ComponenteDigital : virtual public Componente {
+private:
+    int version;
+public:
+    bool setVersion(int v) {
+        if (v >= 1 && v <= 99) {
+            version = v;
+            return true;
+        }
+        return false;
+    }
+    int getVersion() const { return version; }
+};
+
+class Robot : public ComponenteMecanico, public ComponenteDigital {
+private:
+    bool autonomo;
+public:
+    void setAutonomo(bool a) { autonomo = a; }
+    bool getAutonomo() const { return autonomo; }
+};
+
+int main() {
+    Robot r;
+    r.setCodigoSerie(4821);
+    r.setPesoKg(12.5);
+    r.setVersion(3);
+    r.setAutonomo(true);
+
+    std::cout << "Codigo serie: " << r.getCodigoSerie() << std::endl;
+    std::cout << "Peso: " << r.getPesoKg() << std::endl;
+    std::cout << "Version: " << r.getVersion() << std::endl;
+    std::cout << std::boolalpha << "Autonomo: " << r.getAutonomo() << std::endl;
+
+    return 0;
+}
 // Disena esta jerarquia:
 //
 // Componente: atributo privado codigoSerie (int). Setter bool

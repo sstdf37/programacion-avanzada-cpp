@@ -3,6 +3,42 @@
 // Este archivo no tiene codigo de partida. Escribe tu de tu propia clase,
 // tus propios includes y tu propio main().
 //
+#include <iostream>
+
+class Cola {
+private:
+    int* datos;
+    int capacidad;
+public:
+    Cola(int c) : capacidad(c) {
+        datos = new int[capacidad];
+        for (int i = 0; i < capacidad; ++i) {
+            datos[i] = 0;
+        }
+    }
+    ~Cola() {
+        delete[] datos;
+        std::cout << "Cola liberada" << std::endl;
+    }
+    bool agregar(int indice, int valor) {
+        if (indice >= 0 && indice < capacidad) {
+            datos[indice] = valor;
+            return true;
+        }
+        return false;
+    }
+    int getValor(int indice) const { return datos[indice]; }
+};
+
+int main() {
+    Cola c(4);
+    std::cout << std::boolalpha << "Agregar en 1: " << c.agregar(1, 55) << std::endl;
+    std::cout << "Agregar en 9: " << c.agregar(9, 99) << std::endl;
+    for (int i = 0; i < 4; ++i) {
+        std::cout << "Posicion " << i << ": " << c.getValor(i) << std::endl;
+    }
+    return 0;
+}
 // Disena la clase Cola: atributos privados datos (int*) y capacidad (int).
 // Constructor Cola(int c) que asigna capacidad = c, reserva con new[] un
 // arreglo de capacidad enteros y lo guarda en datos, e inicializa cada

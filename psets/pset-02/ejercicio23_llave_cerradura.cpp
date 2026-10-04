@@ -4,6 +4,43 @@
 // tus propios includes (necesitas <memory> ademas de <iostream>) y tu
 // propio main().
 //
+#include <iostream>
+#include <memory>
+class Llave {
+private:
+    int numeroSerie;
+public:
+    Llave() : numeroSerie(0) {}
+    void setNumeroSerie(int n) { numeroSerie = n; }
+    int getNumeroSerie() const { return numeroSerie; }
+};
+
+class Cerradura {
+private:
+    std::unique_ptr<Llave> llaveAsignada;
+public:
+    bool asignarLlave(std::unique_ptr<Llave> nuevaLlave) {
+        if (llaveAsignada) return false;
+        llaveAsignada = std::move(nuevaLlave);
+        return true;
+    }
+    bool tieneLlave() const { return static_cast<bool>(llaveAsignada); }
+};
+
+int main() {
+    auto llave1 = std::make_unique<Llave>();
+    llave1->setNumeroSerie(101);
+    auto llave2 = std::make_unique<Llave>();
+    llave2->setNumeroSerie(202);
+
+    Cerradura cerradura;
+    std::cout << std::boolalpha << "Tiene llave antes: " << cerradura.tieneLlave() << std::endl;
+    std::cout << "Asignar llave1: " << cerradura.asignarLlave(std::move(llave1)) << std::endl;
+    std::cout << "Asignar llave2: " << cerradura.asignarLlave(std::move(llave2)) << std::endl;
+    std::cout << "Tiene llave despues: " << cerradura.tieneLlave() << std::endl;
+
+    return 0;
+}
 // Disena dos clases:
 //
 // Llave: atributo privado numeroSerie (int). Constructor Llave() sin
