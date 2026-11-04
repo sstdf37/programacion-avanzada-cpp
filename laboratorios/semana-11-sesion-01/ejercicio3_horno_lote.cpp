@@ -1,83 +1,119 @@
 #include <iostream>
+#include <map>
+#include <stdexcept>
 
 // Salida esperada:
-// Ventilacion encendida
-// Paso 1: programado a 180, sensor en 175
-// Paso 2: programado a 220, sensor en 226
-// Paso 3: rechazado, temperatura fuera de rango
-// Paso 4: programado a 250, sensor en 249
-// Ventilacion apagada
-// Lote detenido: sensor fuera de control
-// Temperatura programada al final: 200
+// Stock: 120=2 210=5 305=10
+// Pedido de 1 x 120: despachado
+// Pedido de 0 x 305: rechazado, cantidad no positiva
+// Pedido de 1 x 999: rechazado, codigo desconocido
+// Pedido de 5 x 120: rechazado, stock insuficiente
+// Pedido de 5 x 210: despachado
+// Stock: 120=1 210=0 305=10
+// Stock de 305: 10
+// Stock de 999: no registrado
 
-// El horno de curado del laboratorio de materiales ejecuta un lote de pasos.
-// En cada paso se programa una temperatura y despues se compara con la que
-// mide el sensor. Hoy el programa no valida nada: corre todos los pasos,
-// aunque una temperatura sea imposible o el sensor marque otra cosa.
-//
-// Las dos reglas que tiene que hacer cumplir:
-// - Una temperatura programada fuera de 50 a 300 grados es un dato
-//   invalido: ese paso se rechaza y el lote sigue con el siguiente.
-// - Si el sensor se aleja mas de 30 grados de la temperatura programada,
-//   el horno esta fuera de control: el lote completo se detiene en ese
-//   paso y main informa el motivo.
-// En los dos casos, la ventilacion tiene que apagarse al terminar el lote,
-// termine como termine.
-//
-// Decide tu que excepcion de <stdexcept> lanza cada regla, donde se lanza,
-// y en que funcion se atrapa cada una. No cambies la clase Ventilacion ni
-// los datos del lote.
+// La bodega de la Semana 10, reducida al stock. retirar devuelve false
+// cuando no puede retirar, y quien llama no sabe por que.
 
-class Ventilacion {
-    public:
-        Ventilacion() {
-            std::cout << "Ventilacion encendida" << std::endl;
+class Bodega {
+private:
+    std::map<int, int> stock;
+
+public:
+    void ingresar(int codigo, int cantidad) {
+        stock[codigo] = stock[codigo] + cantidad;
+    }
+
+    // TODO 1: cambia retirar para que devuelva void y lance una
+    // excepcion en cada caso en que hoy devuelve false:
+    // - cantidad menor o igual a 0: std::invalid_argument, "cantidad no positiva";
+    // - codigo que no existe: std::out_of_range, "codigo desconocido";
+    // - stock menor que cantidad: std::runtime_error, "stock insuficiente".
+    // Ningun caso rechazado puede modificar el stock.
+    void retirar(int codigo, int cantidad) {
+        if (cantidad <= 0) {
+            throw std::invalid_argument("cantidad no positiva");
         }
 
-        ~Ventilacion() {
-            std::cout << "Ventilacion apagada" << std::endl;
-        }
-};
-
-class Horno {
-    private:
-        int temperaturaProgramada;
-        int ultimaLectura;
-    public:
-        Horno() {
-            temperaturaProgramada = 25;
-            ultimaLectura = 25;
+        if (stock.count(codigo) == 0) {
+            throw std::out_of_range("codigo desconocido");
         }
 
-        int getTemperaturaProgramada() {
-            return temperaturaProgramada;
+        if (stock[codigo] < cantidad) {
+            throw std::runtime_error("stock insuficiente");
         }
 
-        void programar(int temperatura) {
-            temperaturaProgramada = temperatura;
-        }
+        stock[codigo] -= cantidad;
+    }
 
-        void verificarSensor(int lectura) {
-            ultimaLectura = lectura;
-        }
+    // TODO 2: lee el stock con stock.at(codigo), sin revisar antes con
+    // count: si el codigo no existe, que la excepcion salga de aqui.
+    int stockDe(int codigo) {
+        return stock.at(codigo);
+    }
 
-        void ejecutarLote(int temperaturas[], int lecturas[], int pasos) {
-            Ventilacion ventilacion;
-            for (int i = 0; i < pasos; i++) {
-                programar(temperaturas[i]);
-                verificarSensor(lecturas[i]);
-                std::cout << "Paso " << i + 1 << ": programado a " << temperaturas[i] << ", sensor en " << lecturas[i] << std::endl;
-            }
+    void imprimirStock() {
+        std::cout << "Stock:";
+        for (auto par : stock) {
+            std::cout << " " << par.first << "=" << par.second;
         }
+        std::cout << std::endl;
+    }
 };
 
 int main() {
-    int temperaturas[6] = {180, 220, 350, 250, 200, 150};
-    int lecturas[6] = {175, 226, 0, 249, 241, 150};
+    Bodega bodega;
+    bodega.ingresar(305, 10);
+    bodega.ingresar(120, 2);
+    bodega.ingresar(210, 5);
 
-    Horno horno;
-    horno.ejecutarLote(temperaturas, lecturas, 6);
+    bodega.imprimirStock();
 
-    std::cout << "Temperatura programada al final: " << horno.getTemperaturaProgramada() << std::endl;
+    int codigos[5] = {120, 305, 999, 120, 210};
+    int cantidades[5] = {1, 0, 1, 5, 5};
+
+    for (int i = 0; i < 5; i++) {
+        // TODO 3: con try/catch, imprime "despachado" si retirar no lanza
+        // nada, o "rechazado, " y el mensaje de la excepcion si lanza.
+
+        std::cout << "Pedido de "
+                  << cantidades[i]
+                  << " x "
+                  << codigos[i]
+                  << ": ";
+
+        try {
+            bodega.retirar(codigos[i], cantidades[i]);
+            std::cout << "despachado" << std::endl;
+        }
+        catch (const std::exception& e) {
+            std::cout << "rechazado, " << e.what() << std::endl;
+        }
+    }
+
+    bodega.imprimirStock();
+
+    // TODO 4: imprime el stock de 305 y el de 999. Si stockDe lanza
+    // std::out_of_range, imprime "no registrado" en vez del numero.
+
+    try {
+        std::cout << "Stock de 305: "
+                  << bodega.stockDe(305)
+                  << std::endl;
+    }
+    catch (const std::out_of_range&) {
+        std::cout << "Stock de 305: no registrado" << std::endl;
+    }
+
+    try {
+        std::cout << "Stock de 999: "
+                  << bodega.stockDe(999)
+                  << std::endl;
+    }
+    catch (const std::out_of_range&) {
+        std::cout << "Stock de 999: no registrado" << std::endl;
+    }
+
     return 0;
 }

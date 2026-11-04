@@ -1,6 +1,8 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <optional>
+#include <stdexcept>
 
 // Salida esperada:
 // Placa 4521: puesto 0
@@ -26,77 +28,143 @@
 // los datos de main ni el orden de las operaciones.
 
 class Estacionamiento {
-    private:
-        int totalPuestos;
-        std::vector<bool> ocupado;
-        std::map<int, int> puestoDePlaca;
-    public:
-        Estacionamiento(int puestos) {
-            totalPuestos = puestos;
-            for (int i = 0; i < puestos; i++) {
-                ocupado.push_back(false);
+private:
+    int totalPuestos;
+    std::vector<bool> ocupado;
+    std::map<int, int> puestoDePlaca;
+
+public:
+    Estacionamiento(int puestos) {
+        totalPuestos = puestos;
+        for (int i = 0; i < puestos; i++) {
+            ocupado.push_back(false);
+        }
+    }
+
+    // Devuelve el puesto asignado, -1 si no hay puestos libres, o -2 si
+    // la placa ya esta adentro.
+    std::optional<int> asignarPuesto(int placa) {
+        if (puestoDePlaca.count(placa) == 1) {
+            throw std::invalid_argument("placa ya registrada");
+        }
+
+        for (int i = 0; i < totalPuestos; i++) {
+            if (!ocupado[i]) {
+                ocupado[i] = true;
+                puestoDePlaca[placa] = i;
+                return i;
             }
         }
 
-        // Devuelve el puesto asignado, -1 si no hay puestos libres, o -2 si
-        // la placa ya esta adentro.
-        int asignarPuesto(int placa) {
-            if (puestoDePlaca.count(placa) == 1) {
-                return -2;
-            }
-            for (int i = 0; i < totalPuestos; i++) {
-                if (!ocupado[i]) {
-                    ocupado[i] = true;
-                    puestoDePlaca[placa] = i;
-                    return i;
-                }
-            }
-            return -1;
+        return std::nullopt;
+    }
+
+    // Devuelve el puesto de la placa, o -1 si no esta adentro.
+    std::optional<int> puestoDe(int placa) {
+        if (puestoDePlaca.count(placa) == 0) {
+            return std::nullopt;
         }
 
-        // Devuelve el puesto de la placa, o -1 si no esta adentro.
-        int puestoDe(int placa) {
-            if (puestoDePlaca.count(placa) == 0) {
-                return -1;
-            }
-            return puestoDePlaca[placa];
+        return puestoDePlaca[placa];
+    }
+
+    // Libera el puesto de la placa y lo devuelve, o -1 si no estaba.
+    std::optional<int> liberar(int placa) {
+        auto puesto = puestoDe(placa);
+
+        if (!puesto.has_value()) {
+            return std::nullopt;
         }
 
-        // Libera el puesto de la placa y lo devuelve, o -1 si no estaba.
-        int liberar(int placa) {
-            int puesto = puestoDe(placa);
-            if (puesto == -1) {
-                return -1;
-            }
-            ocupado[puesto] = false;
-            puestoDePlaca.erase(placa);
-            return puesto;
-        }
+        ocupado[puesto.value()] = false;
+        puestoDePlaca.erase(placa);
+
+        return puesto;
+    }
 };
 
 int main() {
     Estacionamiento estacionamiento(3);
 
     int llegadas[5] = {4521, 7788, 3011, 9090, 7788};
+
     for (int i = 0; i < 5; i++) {
-        int puesto = estacionamiento.asignarPuesto(llegadas[i]);
-        std::cout << "Placa " << llegadas[i] << ": puesto " << puesto << std::endl;
+        try {
+            auto puesto = estacionamiento.asignarPuesto(llegadas[i]);
+
+            if (puesto.has_value()) {
+                std::cout << "Placa "
+                          << llegadas[i]
+                          << ": puesto "
+                          << puesto.value()
+                          << std::endl;
+            } else {
+                std::cout << "Placa "
+                          << llegadas[i]
+                          << ": sin puesto, estacionamiento lleno"
+                          << std::endl;
+            }
+        }
+        catch (const std::invalid_argument& e) {
+            std::cout << "Placa "
+                      << llegadas[i]
+                      << ": error, "
+                      << e.what()
+                      << std::endl;
+        }
     }
 
     int consultas[2] = {7788, 5555};
+
     for (int i = 0; i < 2; i++) {
-        int puesto = estacionamiento.puestoDe(consultas[i]);
-        std::cout << "Placa " << consultas[i] << " esta en el puesto " << puesto << std::endl;
+        auto puesto = estacionamiento.puestoDe(consultas[i]);
+
+        if (puesto.has_value()) {
+            std::cout << "Placa "
+                      << consultas[i]
+                      << " esta en el puesto "
+                      << puesto.value()
+                      << std::endl;
+        } else {
+            std::cout << "Placa "
+                      << consultas[i]
+                      << " no esta en el estacionamiento"
+                      << std::endl;
+        }
     }
 
-    int liberado = estacionamiento.liberar(4521);
-    std::cout << "Placa 4521 sale del puesto " << liberado << std::endl;
+    auto liberado = estacionamiento.liberar(4521);
 
-    int nuevo = estacionamiento.asignarPuesto(9090);
-    std::cout << "Placa 9090: puesto " << nuevo << std::endl;
+    if (liberado.has_value()) {
+        std::cout << "Placa 4521 sale del puesto "
+                  << liberado.value()
+                  << std::endl;
+    } else {
+        std::cout << "Placa 4521 no esta en el estacionamiento"
+                  << std::endl;
+    }
 
-    int otraVez = estacionamiento.liberar(4521);
-    std::cout << "Placa 4521 sale del puesto " << otraVez << std::endl;
+    auto nuevo = estacionamiento.asignarPuesto(9090);
+
+    if (nuevo.has_value()) {
+        std::cout << "Placa 9090: puesto "
+                  << nuevo.value()
+                  << std::endl;
+    } else {
+        std::cout << "Placa 9090: sin puesto, estacionamiento lleno"
+                  << std::endl;
+    }
+
+    auto otraVez = estacionamiento.liberar(4521);
+
+    if (otraVez.has_value()) {
+        std::cout << "Placa 4521 sale del puesto "
+                  << otraVez.value()
+                  << std::endl;
+    } else {
+        std::cout << "Placa 4521 no esta en el estacionamiento"
+                  << std::endl;
+    }
 
     return 0;
 }
