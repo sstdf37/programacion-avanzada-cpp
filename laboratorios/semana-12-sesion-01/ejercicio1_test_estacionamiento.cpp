@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <stdexcept>
+
 #include "estacionamiento.h"
 
 // Pruebas del estacionamiento de la Semana 11. Cada TEST es una prueba
@@ -22,8 +24,45 @@ TEST(Estacionamiento, PrimeraPlacaRecibePuestoCero) {
 // distintas; la cuarta tiene que recibir un optional vacio
 // (EXPECT_FALSE sobre has_value()).
 
+TEST(Estacionamiento, LlenoDevuelveVacio) {
+    Estacionamiento estacionamiento(3);
+
+    estacionamiento.asignarPuesto(123);
+    estacionamiento.asignarPuesto(456);
+    estacionamiento.asignarPuesto(789);
+
+   std::optional<int> cuarto_estacionamiento = estacionamiento.asignarPuesto(369);
+
+    EXPECT_FALSE(cuarto_estacionamiento.has_value());
+}
+
 // TODO 2: prueba PlacaRepetidaLanza. Asigna la placa 7788 y verifica que
 // asignarla otra vez lanza std::invalid_argument (EXPECT_THROW).
 
+TEST(Estacionamiento, PlacaRepetidaLanza) {
+    Estacionamiento estacionamiento(3);
+
+    estacionamiento.asignarPuesto(123);
+
+    EXPECT_THROW(estacionamiento.asignarPuesto(123), std::invalid_argument);
+}
+
+
 // TODO 3: prueba PuestoLiberadoSeReusa. Llena los 3 puestos, libera la
 // placa del puesto 1 y verifica que la siguiente placa recibe el puesto 1.
+
+TEST(Estacionamiento, PuestoLiberadoSeReusa) {
+    Estacionamiento estacionamiento(3);
+
+    estacionamiento.asignarPuesto(123);
+    estacionamiento.asignarPuesto(456);
+    estacionamiento.asignarPuesto(789);
+    
+    estacionamiento.liberar(456);
+    
+
+    std::optional<int> nuevo_espacio = estacionamiento.asignarPuesto(444);
+
+    ASSERT_TRUE(nuevo_espacio.has_value());
+    EXPECT_EQ(*nuevo_espacio, 1);
+}
