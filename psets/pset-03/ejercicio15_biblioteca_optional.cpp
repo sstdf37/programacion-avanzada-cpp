@@ -19,6 +19,7 @@
 #include <iostream>
 #include <map>
 #include <optional>
+#include <algorithm>
 #include <set>
 
 class Biblioteca {
@@ -31,17 +32,32 @@ public:
     }
     std::optional<int> anioDe(int codigo) {
         // TODO: si el codigo no esta, devuelve std::nullopt; si esta, su anio.
+        if (auto it = anioPorCodigo.find(codigo); it != anioPorCodigo.end()) {
+            return it->second;
+        }
         return std::nullopt;
     }
     std::optional<int> masAntiguo() {
         // TODO: devuelve el anio mas antiguo de todos los libros, o std::nullopt
         // si no hay libros.
+        if (auto it = std::min_element(anioPorCodigo.begin(), anioPorCodigo.end(),
+                                       [](const auto& a, const auto& b) {
+                                           return a.second < b.second;
+                                       });
+            it != anioPorCodigo.end()) {
+            return it->second;
+        }
         return std::nullopt;
     }
     std::optional<int> prestar(int codigo, int hoy) {
         // TODO: si el libro no existe o ya esta prestado, devuelve std::nullopt.
         // Si no, lo marca como prestado y devuelve el dia de devolucion,
         // hoy + 7.
+        if (auto it = anioPorCodigo.find(codigo);
+            it != anioPorCodigo.end() && !prestados.contains(codigo)) {
+            prestados.insert(codigo);
+            return hoy + 7;
+        }
         return std::nullopt;
     }
 };

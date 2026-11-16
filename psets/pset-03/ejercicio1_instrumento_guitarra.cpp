@@ -36,7 +36,7 @@ public:
     }
     int notasPorMinuto() override {
         // TODO: devuelve cuerdas * 20.
-        return 0;
+        return cuerdas * 20;
     }
     int volumen() {
         return 8;
@@ -49,6 +49,9 @@ private:
 public:
     Bateria(int t) {
         tambores = t;
+    }
+    int notasPorMinuto () override{
+        return tambores * 30;
     }
     // TODO: escribe aqui notasPorMinuto, sobrescrito con override: devuelve
     // tambores * 30.
