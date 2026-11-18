@@ -27,6 +27,7 @@ class TarjetaAtomica {
         std::atomic<int> saldo;
         std::atomic<int> aceptados;
         std::atomic<int> rechazados;
+
     public:
         TarjetaAtomica() {
             saldo = 50;
@@ -47,11 +48,24 @@ class TarjetaAtomica {
         // Cobra monto solo si alcanza, sin mutex.
         void cobrar(int monto) {
             // TODO 1: lee el saldo en una variable local (int actual = saldo;).
+            int actual = saldo;
+
             // 2: en un ciclo: si actual < monto, cuenta un rechazo y sale.
             // Si no, intenta saldo.compare_exchange_weak(actual, actual - monto):
             // cambia el saldo solo si sigue valiendo actual. Si lo logra,
             // cuenta un cobro aceptado y sale. Si no, compare_exchange_weak
             // ya dejo en actual el saldo nuevo: el ciclo vuelve a decidir.
+            while (true) {
+                if (actual < monto) {
+                    rechazados++;
+                    return;
+                }
+
+                if (saldo.compare_exchange_weak(actual, actual - monto)) {
+                    aceptados++;
+                    return;
+                }
+            }
         }
 
         int getSaldo() {
@@ -87,11 +101,13 @@ void caja(TarjetaAtomica* tarjetas, int intentos) {
 
 int enNegativo(TarjetaAtomica* tarjetas) {
     int total = 0;
+
     for (int t = 0; t < TARJETAS; t++) {
         if (tarjetas[t].getSaldo() < 0) {
             total = total + 1;
         }
     }
+
     return total;
 }
 
@@ -101,22 +117,39 @@ TarjetaAtomica tarjetas[TARJETAS];
 int main() {
     std::thread a(cajaIngenua, ingenuas, 40);
     std::thread b(cajaIngenua, ingenuas, 40);
+
     a.join();
     b.join();
-    std::cout << "Ingenuo, tarjetas en negativo: " << enNegativo(ingenuas) << std::endl;
+
+    std::cout << "Ingenuo, tarjetas en negativo: "
+              << enNegativo(ingenuas)
+              << std::endl;
 
     std::thread c(caja, tarjetas, 40);
     std::thread d(caja, tarjetas, 40);
+
     c.join();
     d.join();
+
     int aceptados = 0;
     int rechazados = 0;
+
     for (int t = 0; t < TARJETAS; t++) {
         aceptados = aceptados + tarjetas[t].getAceptados();
         rechazados = rechazados + tarjetas[t].getRechazados();
     }
-    std::cout << "Correcto, tarjetas en negativo: " << enNegativo(tarjetas) << std::endl;
-    std::cout << "Correcto, cobros aceptados: " << aceptados << std::endl;
-    std::cout << "Correcto, cobros rechazados: " << rechazados << std::endl;
+
+    std::cout << "Correcto, tarjetas en negativo: "
+              << enNegativo(tarjetas)
+              << std::endl;
+
+    std::cout << "Correcto, cobros aceptados: "
+              << aceptados
+              << std::endl;
+
+    std::cout << "Correcto, cobros rechazados: "
+              << rechazados
+              << std::endl;
+
     return 0;
 }

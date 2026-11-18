@@ -117,7 +117,6 @@ int main() {
     for (int i = 0; i < 5; i++) {
         total = total + logradas[i];
     }
-
     int aMedias = 0;
     for (int asiento = 0; asiento < 20000; asiento = asiento + 2) {
         bool primero = taquilla.duenoDe(asiento) == 5;

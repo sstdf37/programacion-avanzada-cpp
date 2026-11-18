@@ -43,6 +43,75 @@
 // Despues de cerrar, se acepta un trabajo: 0
 
 // TODO: escribe aqui la clase CentroDeImpresion.
+class CentroDeImpresion {
+    private:
+        std::map<int, int> paginasPorEstudiante;
+        std::mutex mtx;
+
+        std::atomic<bool> cerrado;
+        std::atomic<int> aceptados;
+        std::atomic<int> rechazados;
+        std::atomic<int> totalPaginas;
+
+    public:
+        CentroDeImpresion() {
+            cerrado = false;
+            aceptados = 0;
+            rechazados = 0;
+            totalPaginas = 0;
+        }
+
+       bool enviar(int estudiante, int paginas) {
+    std::lock_guard<std::mutex> lock(mtx);
+
+    if (cerrado || paginas <= 0) {
+        return false;
+    }
+
+    if (paginasPorEstudiante[estudiante] + paginas > 100) {
+        rechazados++;
+        return false;
+    }
+
+    paginasPorEstudiante[estudiante] += paginas;
+    aceptados++;
+    totalPaginas += paginas;
+
+    return true;
+}
+
+        void cerrar() {
+            cerrado = true;
+        }
+
+        bool estaCerrado() {
+            return cerrado;
+        }
+
+        int trabajosAceptados() {
+            return aceptados;
+        }
+
+        int rechazadosPorCuota() {
+            return rechazados;
+        }
+
+        int paginasTotales() {
+            return totalPaginas;
+        }
+
+        int paginasDe(int estudiante) {
+            std::lock_guard<std::mutex> lock(mtx);
+
+            auto it = paginasPorEstudiante.find(estudiante);
+
+            if (it == paginasPorEstudiante.end()) {
+                return 0;
+            }
+
+            return it->second;
+        }
+};
 
 void computadora(CentroDeImpresion* centro) {
     for (int estudiante = 1; estudiante <= 50; estudiante++) {

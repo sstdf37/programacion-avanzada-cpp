@@ -3,30 +3,99 @@
 // Este archivo no tiene codigo de partida. Escribe tus propios includes, tus
 // propias clases y tu propio main().
 //
+#include <iostream>
+#include <iomanip>
 // Disena tres clases:
 //
 // Vehiculo: atributo privado tarifaBase (double). Constructor sin
 // parametros que la pone en 0, y metodo void setTarifaBase(double t) que la
 // asigna sin validar. Getter double getTarifaBase(). Destructor virtual con
 // cuerpo vacio. Metodo virtual double peaje() que devuelve tarifaBase.
+class Vehiculo {
+private:
+    double tarifaBase;
+public:
+    Vehiculo() : tarifaBase(0) {}
+    void setTarifaBase(double t) {
+        tarifaBase = t;
+    }
+    double getTarifaBase() const {
+        return tarifaBase;
+    }
+    virtual ~Vehiculo() {}
+    virtual double peaje() const {
+        return tarifaBase;
+    }
+};
 //
 // Camion: hereda publicamente de Vehiculo. Atributo privado ejes (int).
 // Constructor Camion(double tarifa, int e) que llama setTarifaBase(tarifa)
 // y asigna ejes. peaje() con override: tarifa base mas 1.5 por cada eje.
 //
+class Camion : public Vehiculo {
+private:
+    int ejes;
+public:
+    Camion(double tarifa, int e) : ejes(e) {
+        setTarifaBase(tarifa);
+    }
+    double peaje() const override {
+        return getTarifaBase() + 1.5 * ejes;
+    }
+};
 // Bus: hereda publicamente de Vehiculo. Atributo privado pasajeros (int).
 // Constructor Bus(double tarifa, int p), igual que Camion. peaje() con
 // override: el doble de la tarifa base si lleva mas de 30 pasajeros; si no,
 // la tarifa base.
+class Bus : public Vehiculo {
+private:
+    int pasajeros;
+public:
+    Bus(double tarifa, int p) : pasajeros(p) {
+        setTarifaBase(tarifa);
+    }
+    double peaje() const override {
+        if (pasajeros > 30) {
+            return getTarifaBase() * 2;
+        }
+        return getTarifaBase();
+    }
+};
 //
 // Una funcion libre double recaudacion(Vehiculo* fila[], int cantidad) que
 // suma el peaje de cada vehiculo de la fila, llamandolo a traves del
 // puntero.
+double recaudacion(Vehiculo* fila[], int cantidad) {
+    double total = 0;
+    for (int i = 0; i < cantidad; ++i) {
+        total += fila[i]->peaje();
+    }
+    return total;
+}
 //
 // En main(): crea un Vehiculo comun con tarifa base 1, un Camion con tarifa
 // 2 y 4 ejes, un Bus con tarifa 2 y 45 pasajeros, y un Bus con tarifa 2 y
 // 12 pasajeros. Ponlos en un arreglo de 4 punteros Vehiculo*, en ese orden.
 // Imprime el peaje de cada uno con un ciclo, y despues la recaudacion total.
+int main() {
+    Vehiculo vehiculo;
+    vehiculo.setTarifaBase(1);
+
+    Camion camion(2, 4);
+    Bus bus1(2, 45);
+    Bus bus2(2, 12);
+
+    Vehiculo* fila[4] = { &vehiculo, &camion, &bus1, &bus2 };
+
+    for (int i = 0; i < 4; ++i) {
+        std::cout << "Vehiculo " << i << " paga: " << fila[i]->peaje() << '\n';
+    }
+
+    double totalRecaudacion = recaudacion(fila, 4);
+    std::cout << "Recaudacion: " << totalRecaudacion << '\n';
+
+    return 0;
+}
 //
 // Compilar: g++ -std=c++20 -Wall -Wextra -g -o ejercicio17 ejercicio17_peaje.cpp
 // Ejecutar: ./ejercicio17

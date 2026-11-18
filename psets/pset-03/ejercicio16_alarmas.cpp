@@ -3,20 +3,75 @@
 // Este archivo no tiene codigo de partida. Escribe tus propios includes, tus
 // propias clases y tu propio main().
 //
+#include <iostream>
+#include <string>
 // Disena tres clases:
 //
+
 // Alarma: destructor virtual con cuerpo vacio. Metodo virtual int
 // segundosDeAviso() que devuelve 10. Metodo int prioridad(), NO virtual, que
 // devuelve 1.
+class Alarma {
+public:
+    virtual ~Alarma() {}
+    virtual int segundosDeAviso() {
+        return 10;
+    }
+    int prioridad() {
+        return 1;
+    }
+};
+
 //
 // AlarmaDeIncendio: hereda publicamente de Alarma. Atributo privado pisos
 // (int), asignado en un constructor AlarmaDeIncendio(int p). Sobrescribe
 // segundosDeAviso() con override: devuelve pisos * 15. Tiene su propio
 // metodo int prioridad() (tampoco virtual) que devuelve 3.
+class AlarmaDeIncendio : public Alarma {
+private:
+    int pisos;
+
+public:
+    explicit AlarmaDeIncendio(int p) : pisos(p) {}
+    int segundosDeAviso() override {
+        return pisos * 15;
+    }
+    int prioridad() {
+        return 3;
+    }
+};
 //
 // AlarmaDeIntrusion: hereda publicamente de Alarma. Atributo privado
 // sensores (int), asignado en el constructor. Sobrescribe segundosDeAviso()
 // con override: devuelve sensores * 4.
+class AlarmaDeIntrusion : public Alarma {
+private:
+    int sensores;
+
+public:
+    explicit AlarmaDeIntrusion(int s) : sensores(s) {}
+    int segundosDeAviso() override {
+        return sensores * 4;
+    }
+};
+
+int main() {
+    AlarmaDeIncendio incendio(4);
+    AlarmaDeIntrusion intrusion(9);
+    Alarma* puntero = &incendio;
+
+    std::cout << "Incendio por puntero, aviso: " << puntero->segundosDeAviso() << '\n';
+    std::cout << "Incendio por puntero, prioridad: " << puntero->prioridad() << '\n';
+    std::cout << "Incendio directa, prioridad: " << incendio.prioridad() << '\n';
+
+    puntero = &intrusion;
+    std::cout << "Intrusion por puntero, aviso: " << puntero->segundosDeAviso() << '\n';
+
+    Alarma alarma;
+    std::cout << "Alarma comun por puntero, aviso: " << alarma.segundosDeAviso() << '\n';
+
+    return 0;
+}
 //
 // En main(): crea una AlarmaDeIncendio de 4 pisos y una AlarmaDeIntrusion
 // de 9 sensores. Con un puntero Alarma* que apunte a la de incendio,
