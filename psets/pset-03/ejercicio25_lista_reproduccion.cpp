@@ -3,6 +3,9 @@
 // Este archivo no tiene codigo de partida. Escribe tus propios includes, tu
 // propia clase y tu propio main().
 //
+#include <iostream>
+#include <list>
+#include <set>
 // Disena la clase ListaDeReproduccion, con dos atributos privados: una
 // std::list<int> pendientes (los ids de canciones por sonar, en orden) y un
 // std::set<int> reproducidas (las que ya sonaron). Metodos:
@@ -16,11 +19,71 @@
 //   iterador y usa lo que devuelve erase(it) para seguir: despues de borrar,
 //   el iterador viejo ya no sirve.
 // - int pendientesPorSonar(): cuantas quedan.
+class ListaDeReproduccion {
+private:
+    std::list<int> pendientes;
+    std::set<int> reproducidas;
+public:
+    void agregarAlFinal(int id) {
+        pendientes.push_back(id);
+    }
+    void agregarSiguiente(int id) {
+        pendientes.push_front(id);
+    }
+    int reproducir() {
+        if (pendientes.empty()) {
+            return -1;
+        }
+        int id = pendientes.front();
+        pendientes.pop_front();
+        reproducidas.insert(id);
+        return id;
+    }
+    bool yaSono(int id) const {
+        return reproducidas.find(id) != reproducidas.end();
+    }
+    int quitarTodas(int id) {
+        int count = 0;
+        for (auto it = pendientes.begin(); it != pendientes.end(); ) {
+            if (*it == id) {
+                it = pendientes.erase(it);
+                count++;
+            } else {
+                ++it;
+            }
+        }
+        return count;
+    }
+    int pendientesPorSonar() const {
+        return pendientes.size();
+    }
+};
 //
 // En main(): agrega al final 11, 22, 11 y 33; agrega como siguiente la 44.
 // Reproduce dos veces (imprime cada id). Quita todas las 11 (imprime
 // cuantas). Imprime cuantas quedan, si la 44 ya sono y si la 33 ya sono.
 // Reproduce dos veces mas. Usa los textos de la salida esperada.
+int main() {
+    ListaDeReproduccion lista;
+    lista.agregarAlFinal(11);
+    lista.agregarAlFinal(22);
+    lista.agregarAlFinal(11);
+    lista.agregarAlFinal(33);
+    lista.agregarSiguiente(44);
+
+    std::cout << "Suena: " << lista.reproducir() << std::endl;
+    std::cout << "Suena: " << lista.reproducir() << std::endl;
+
+    std::cout << "Quitadas: " << lista.quitarTodas(11) << std::endl;
+    std::cout << "Pendientes: " << lista.pendientesPorSonar() << std::endl;
+    std::cout << "La 44 ya sono: " << (lista.yaSono(44) ? 1 : 0) << std::endl;
+    std::cout << "La 33 ya sono: " << (lista.yaSono(33) ? 1 : 0) << std::endl;
+
+    std::cout << "Suena: " << lista.reproducir() << std::endl;
+    std::cout << "Suena: " << lista.reproducir() << std::endl;
+
+    return 0;
+}
 //
 // Compilar: g++ -std=c++20 -Wall -Wextra -g -o ejercicio25 ejercicio25_lista_reproduccion.cpp
 // Ejecutar: ./ejercicio25

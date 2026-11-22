@@ -3,6 +3,9 @@
 // Este archivo no tiene codigo de partida. Escribe tus propios includes
 // (necesitas <optional>), tu propia clase y tu propio main().
 //
+#include <iostream>
+#include <optional>
+#include <map>
 // El consultorio atiende una cita por hora, de las 8 a las 17 (la ultima
 // cita empieza a las 17). Disena la clase AgendaDelConsultorio, con un
 // atributo privado std::map<int, int> pacientePorHora (hora y numero de
@@ -18,6 +21,45 @@
 //   devuelve vacio sin agendar nada.
 // - bool cancelar(int hora): si hay cita a esa hora la borra y devuelve
 //   true; si no, false.
+class AgendaDelConsultorio {
+private:
+    std::map<int, int> pacientePorHora;
+public:
+    std::optional<int> pacienteEn(int hora) const {
+        auto it = pacientePorHora.find(hora);
+        if (it != pacientePorHora.end()) {
+            return it->second;
+        }
+        return std::nullopt;
+    }
+    std::optional<int> primeraLibreDesde(int hora) const {
+        if (hora < 8) {
+            hora = 8;
+        }
+        for (int h = hora; h <= 17; ++h) {
+            if (pacientePorHora.find(h) == pacientePorHora.end()) {
+                return h;
+            }
+        }
+        return std::nullopt;
+    }
+    std::optional<int> agendar(int paciente, int desde) {
+        auto horaLibre = primeraLibreDesde(desde);
+        if (horaLibre) {
+            pacientePorHora[*horaLibre] = paciente;
+            return horaLibre;
+        }
+        return std::nullopt;
+    }
+    bool cancelar(int hora) {
+        auto it = pacientePorHora.find(hora);
+        if (it != pacientePorHora.end()) {
+            pacientePorHora.erase(it);
+            return true;
+        }
+        return false;
+    }
+};
 //
 // En main(): agenda al paciente 501 desde las 8, al 502 desde las 8, al 503
 // desde las 16, al 504 desde las 16, y otra vez al 504 desde las 16,
@@ -26,6 +68,45 @@
 // atrapa std::bad_optional_access por referencia constante e imprime "Nadie
 // a las 13". Cancela la cita de las 8 y agenda al 505 desde las 7. Usa los
 // textos de la salida esperada.
+int main() {
+    AgendaDelConsultorio agenda;
+
+    auto hora501 = agenda.agendar(501, 8);
+    std::cout << "Paciente 501: " << (hora501.has_value() ? std::to_string(*hora501) : "sin hora") << std::endl;
+
+    auto hora502 = agenda.agendar(502, 8);
+    std::cout << "Paciente 502: " << (hora502.has_value() ? std::to_string(*hora502) : "sin hora") << std::endl;
+
+    auto hora503 = agenda.agendar(503, 16);
+    std::cout << "Paciente 503: " << (hora503.has_value() ? std::to_string(*hora503) : "sin hora") << std::endl;
+
+    auto hora504 = agenda.agendar(504, 16);
+    std::cout << "Paciente 504: " << (hora504.has_value() ? std::to_string(*hora504) : "sin hora") << std::endl;
+
+    auto hora504_2 = agenda.agendar(504, 16);
+    std::cout << "Paciente 504 otra vez: " << (hora504_2.has_value() ? std::to_string(*hora504_2) : "sin hora") << std::endl;
+
+    auto paciente9 = agenda.pacienteEn(9);
+    if (paciente9.has_value()) {
+        std::cout << "A las 9: " << *paciente9 << std::endl;
+    } else {
+        std::cout << "A las 9: nadie" << std::endl;
+    }
+
+    auto paciente12 = agenda.pacienteEn(12).value_or(0);
+    std::cout << "A las 12: " << paciente12 << std::endl;
+
+    try {
+        int paciente13 = agenda.pacienteEn(13).value();
+        std::cout << "A las 13: " << paciente13 << std::endl;
+    } catch (const std::bad_optional_access&) {
+        std::cout << "Nadie a las 13" << std::endl;
+    }
+
+    agenda.cancelar(8);
+    auto hora505 = agenda.agendar(505, 7);
+    std::cout << "Paciente 505: " << (hora505.has_value() ? std::to_string(*hora505) : "sin hora") << std::endl;
+}
 //
 // Compilar: g++ -std=c++20 -Wall -Wextra -g -o ejercicio29 ejercicio29_agenda_optional.cpp
 // Ejecutar: ./ejercicio29

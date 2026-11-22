@@ -3,6 +3,9 @@
 // Este archivo no tiene codigo de partida. Escribe tus propios includes, tu
 // propia clase y tu propio main().
 //
+#include <iostream>
+#include <iomanip>
+#include <map>
 // Disena la clase Inventario, con un atributo privado std::map<int, int>
 // stockPorCodigo (codigo de producto y unidades). Metodos:
 // - void ingresar(int codigo, int unidades): suma unidades al stock del
@@ -18,11 +21,69 @@
 // - void imprimir(): cada codigo con sus unidades, en orden de codigo,
 //   recorriendo el map con un iterador.
 //
+class Inventario {
+private:
+    std::map<int, int> stockPorCodigo;
+public:
+    void ingresar(int codigo, int unidades) {
+        if (unidades > 0) {
+            stockPorCodigo[codigo] += unidades;
+        }
+    }
+    bool retirar(int codigo, int unidades) {
+        auto it = stockPorCodigo.find(codigo);
+        if (it == stockPorCodigo.end() || it->second < unidades) {
+            return false;
+        }
+        it->second -= unidades;
+        return true;
+    }
+    int stockDe(int codigo) const {
+        auto it = stockPorCodigo.find(codigo);
+        return (it != stockPorCodigo.end()) ? it->second : 0;
+    }
+    int agotados() const {
+        int count = 0;
+        for (const auto& [codigo, unidades] : stockPorCodigo) {
+            if (unidades == 0) {
+                count++;
+            }
+        }
+        return count;
+    }
+    int codigos() const {
+        return stockPorCodigo.size();
+    }
+    void imprimir() const {
+        for (const auto& [codigo, unidades] : stockPorCodigo) {
+            std::cout << codigo << ": " << unidades << std::endl;
+        }
+    }
+}; 
 // En main(): ingresa 40 del 300, 15 del 120, 5 del 450 y -3 del 999.
 // Retira 15 del 120, 10 del 450 y 1 del 777, imprimiendo cada resultado.
 // Imprime el stock del 999, la cantidad de codigos, los agotados, y el
 // inventario completo, con los textos de la salida esperada.
 //
+int main() {
+    Inventario inventario;
+    inventario.ingresar(300, 40);
+    inventario.ingresar(120, 15);
+    inventario.ingresar(450, 5);
+    inventario.ingresar(999, -3); 
+
+    std::cout << "Retirar 15 del 120: " << inventario.retirar(120, 15) << std::endl;
+    std::cout << "Retirar 10 del 450: " << inventario.retirar(450, 10) << std::endl;
+    std::cout << "Retirar 1 del 777: " << inventario.retirar(777, 1) << std::endl;
+
+    std::cout << "Stock del 999: " << inventario.stockDe(999) << std::endl;
+    std::cout << "Codigos registrados: " << inventario.codigos() << std::endl;
+    std::cout << "Agotados: " << inventario.agotados() << std::endl;
+
+    inventario.imprimir();
+
+    return 0;
+}
 // Compilar: g++ -std=c++20 -Wall -Wextra -g -o ejercicio24 ejercicio24_inventario_map.cpp
 // Ejecutar: ./ejercicio24
 //
