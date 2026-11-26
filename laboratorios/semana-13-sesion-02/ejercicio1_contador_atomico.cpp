@@ -28,7 +28,7 @@ class ContadorDeVisitas {
         void registrar() {
             // TODO 2: con total atomico, cambia esta linea por una sola operacion
             // atomica: total++ (o total.fetch_add(1)).
-            total.fetch_add(1);
+            total = total + 1;
         }
 
         int getTotal() {
