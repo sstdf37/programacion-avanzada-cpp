@@ -48,11 +48,20 @@ int main() {
     // TODO 1: un std::vector<Particula> con espacio reservado para todas,
     // y las mismas particulas que la otra version (mismas velocidades),
     // agregadas con push_back(Particula(...)).
+    std::vector<Particula> particulas;
+    particulas.reserve(PARTICULAS);
 
     // TODO 2: los CUADROS cuadros, actualizando cada particula con
     // dt = 1 / 60 de segundo.
+    int cuadros = 600;
+    for (int i = 0; i < CUADROS; i++) {
+        for (int j = 0; j < PARTICULAS; j++) {
+            particulas[j].actualizar(1.0f / 60.0f);
+        }
+    }
 
     // TODO 3: la altura promedio al final, con el mismo mensaje que la otra
     // version.
+    std::cout << "Altura promedio: " << 0.0f << std::endl;
     return 0;
 }

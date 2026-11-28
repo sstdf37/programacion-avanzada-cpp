@@ -33,6 +33,7 @@ struct Venta {
 // ColaSegura<Pedido> y las pruebas como ColaSegura<int> y
 // ColaSegura<double>: conviertela en una plantilla de clase. Hasta que lo
 // hagas, el proyecto no compila.
+template <typename T>
 class ColaSegura {
 public:
     ColaSegura() {
@@ -40,24 +41,30 @@ public:
     }
 
     // Deja un elemento al final de la cola.
-    void agregar(Pedido elemento) {
+    void agregar(T elemento) {
         // TODO 4: tres cajas agregan a la vez. Protege el push_back con el
         // candado de la clase.
+        std::lock_guard<std::mutex> guardia(candado);
         elementos.push_back(elemento);
     }
 
     // Saca el elemento mas antiguo que no se haya sacado todavia, o
     // std::nullopt si ya no quedan.
-    std::optional<Pedido> tomar() {
+    std::optional<T> tomar() {
         // TODO 4: dos cocineros toman a la vez. Mirar si quedan elementos y
         // avanzar siguiente tienen que pasar juntos, sin que otro hilo se
         // meta en medio.
+        std::lock_guard<std::mutex> guardia(candado);
+
         int total = elementos.size();
+
         if (siguiente >= total) {
             return std::nullopt;
         }
-        Pedido elemento = elementos[siguiente];
+
+        T elemento = elementos[siguiente];
         siguiente++;
+
         return elemento;
     }
 
@@ -69,7 +76,7 @@ public:
     }
 
 private:
-    std::vector<Pedido> elementos;
+    std::vector<T> elementos;
     int siguiente;
     std::mutex candado;
 };
@@ -91,7 +98,24 @@ public:
         // producto a la vez: preguntar si alcanza y restar son una sola
         // seccion critica. Si lanzas una excepcion con el candado tomado,
         // ¿quien lo suelta?
-        return false;
+
+        std::lock_guard<std::mutex> guardia(candado);
+
+        if (cantidad <= 0) {
+            throw std::invalid_argument("cantidad invalida");
+        }
+
+        if (stock.count(producto) == 0) {
+            throw std::invalid_argument("producto inexistente");
+        }
+
+        if (stock[producto] < cantidad) {
+            return false;
+        }
+
+        stock[producto] -= cantidad;
+
+        return true;
     }
 
     // Unidades que quedan del producto (0 si no existe).
@@ -112,6 +136,9 @@ class Estadisticas {
 public:
     Estadisticas() {
         // TODO 6: los tres contadores empiezan en 0.
+        despachados = 0;
+        sinStock = 0;
+        invalidos = 0;
     }
 
     void anotarDespachado() {
@@ -142,15 +169,16 @@ private:
     // TODO 6: los dos cocineros anotan a la vez, y cada anotacion es una
     // sola operacion sobre un numero: cambia el tipo de los tres contadores
     // para que no se pierda ninguna, sin usar un mutex.
-    int despachados;
-    int sinStock;
-    int invalidos;
+    std::atomic<int> despachados;
+    std::atomic<int> sinStock;
+    std::atomic<int> invalidos;
 };
 
 class RegistroDeVentas {
 public:
     void anotar(Venta venta) {
         // TODO 7: los dos cocineros anotan ventas a la vez.
+        std::lock_guard<std::mutex> guardia(candado);
         ventas.push_back(venta);
     }
 

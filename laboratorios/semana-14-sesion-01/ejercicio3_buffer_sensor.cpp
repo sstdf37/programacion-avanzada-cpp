@@ -42,6 +42,57 @@ const int LECTURAS = 1000000;
 
 // TODO: escribe aqui la clase BufferCircular.
 
+class BufferCircular {
+public:
+    BufferCircular() {
+        cantidad = 0;
+        indice = 0;
+    }
+    void agregar(double valor) {
+        lecturas[indice] = valor;
+        indice = (indice + 1) % CAPACIDAD;
+        if (cantidad < CAPACIDAD) {
+            cantidad++;
+        }
+    }
+    int getCantidad() {
+        return cantidad;
+    }
+    double masAntigua() {
+        if (cantidad == 0) {
+            return 0.0;
+        }
+        int indiceAntiguo = (indice - cantidad + CAPACIDAD) % CAPACIDAD;
+        return lecturas[indiceAntiguo];
+    }
+    double promedio() {
+        if (cantidad == 0) {
+            return 0.0;
+        }
+        double suma = 0.0;
+        for (int i = 0; i < cantidad; i++) {
+            suma += lecturas[i];
+        }
+        return suma / cantidad;
+    }
+    double minimo() {
+        if (cantidad == 0) {
+            return 0.0;
+        }
+        double min = lecturas[0];
+        for (int i = 1; i < cantidad; i++) {
+            if (lecturas[i] < min) {
+                min = lecturas[i];
+            }
+        }
+        return min;
+    }
+private:
+    double lecturas[CAPACIDAD];
+    int cantidad;
+    int indice;
+};
+
 int main() {
     BufferCircular buffer;
     long long reservasAntes = reservasHechas;
